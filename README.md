@@ -1,5 +1,5 @@
 # symfony5
-Docker for symphony 5 with composer, yarn, nodejs and npm
+Docker for symfony 5 with composer, yarn, nodejs and npm
 ## execution in your symfony directory
 `
 docker run -d -p 80:80  --name symfony5 -v .:/app cadotinfo/symfony5
