@@ -91,20 +91,17 @@ RUN npm install -g yarn
 
 COPY apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY . /app
-RUN echo 'alias ls="ls --color"'>>/etc/bash.bashrc
-#RUN apt-get update && apt-get install -y locate zlib1g-dev chromium && docker-php-ext-install zip
+
 #ENV PANTHER_NO_SANDBOX 1
 
-#RUN apt install  libmemcached-tools -y
-#RUN set -ex \
-#    && rm -rf /var/lib/apt/lists/* \
-#    && MEMCACHED="`mktemp -d`" \
-#    && curl -skL https://github.com/php-memcached-dev/php-memcached/archive/master.tar.gz | tar zxf - --strip-components 1 -C $MEMCACHED \
-#    && docker-php-ext-configure $MEMCACHED \
-#    && docker-php-ext-install $MEMCACHED \
-#    && rm -rf $MEMCACHED
-
-#RUN echo "extension=memcache.so" >> /usr/local/etc/php/conf.d/memcache.ini
+RUN apt install memcached libmemcached-tools -y
+RUN set -ex \
+    && rm -rf /var/lib/apt/lists/* \
+    && MEMCACHED="`mktemp -d`" \
+    && curl -skL https://github.com/php-memcached-dev/php-memcached/archive/master.tar.gz | tar zxf - --strip-components 1 -C $MEMCACHED \
+    && docker-php-ext-configure $MEMCACHED \
+    && docker-php-ext-install $MEMCACHED \
+    && rm -rf $MEMCACHED
 
 
 WORKDIR /app
