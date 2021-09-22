@@ -82,8 +82,8 @@ RUN pecl clear-cache \
 COPY php.ini /php.ini
 RUN cat /php.ini>>${PHP_INI_DIR}/php.ini
 
-RUN wget https://getcomposer.org/download/2.0.9/composer.phar \
-  && mv composer.phar /usr/bin/composer && chmod +x /usr/bin/composer
+RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
+RUN chmod +x /usr/bin/composer
 
 RUN curl -fsSL https://deb.nodesource.com/setup_15.x | bash -
 RUN apt-get install -y nodejs nano
