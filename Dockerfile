@@ -33,6 +33,7 @@ RUN apt-get update -q -y \
   wget \
   tree \
   gdb-minimal \
+  net-tools \
   && rm -rf /var/lib/apt/lists/*
 
 # Install and configure php plugins
@@ -51,6 +52,7 @@ RUN set -xe \
   libonig-dev \
   libmagickwand-dev \
   libpq-dev \
+  apt-utils \
   " \
   && apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
   # Extract php source and install missing extensions
@@ -66,12 +68,15 @@ RUN set -xe \
 # Install imagemagick
 RUN pecl install -o imagick && docker-php-ext-enable imagick 
 
-# Install xdebug but not active TODO:àfinir
-RUN pecl install -o "xdebug" 
-COPY xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini.disabled
-COPY xdebug.sh /scripts/xdebug.sh
-RUN chmod +x /scripts/xdebug.sh
-RUN /scripts/xdebug.sh
+# Install xdebug
+RUN pecl install -f xdebug \
+&& echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so) \
+\nxdebug.remote_enable=1 \
+\nxdebug.remote_autostart=1 \
+\nxdebug.start_with_request=yes \
+\nxdebug.client_host=172.17.0.1 \
+\nxdebug.mode=develop,debug,coverage,trace,profile,gcstats \
+" > /usr/local/etc/php/conf.d/xdebug.ini;
 
 # Delete source & builds deps so it does not hang around in layers taking up space
 RUN pecl clear-cache \
@@ -85,27 +90,13 @@ RUN cat /php.ini>>${PHP_INI_DIR}/php.ini
 RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer
 RUN chmod +x /usr/bin/composer
 
-RUN curl -fsSL https://deb.nodesource.com/setup_15.x | bash -
-RUN apt-get install -y nodejs nano
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs nano 
 RUN npm install -g yarn
 
 COPY apache.conf /etc/apache2/sites-enabled/000-default.conf
 COPY . /app
 RUN echo 'alias ls="ls --color"'>>/etc/bash.bashrc
-#RUN apt-get update && apt-get install -y locate zlib1g-dev chromium && docker-php-ext-install zip
-#ENV PANTHER_NO_SANDBOX 1
-
-#RUN apt install  libmemcached-tools -y
-#RUN set -ex \
-#    && rm -rf /var/lib/apt/lists/* \
-#    && MEMCACHED="`mktemp -d`" \
-#    && curl -skL https://github.com/php-memcached-dev/php-memcached/archive/master.tar.gz | tar zxf - --strip-components 1 -C $MEMCACHED \
-#    && docker-php-ext-configure $MEMCACHED \
-#    && docker-php-ext-install $MEMCACHED \
-#    && rm -rf $MEMCACHED
-
-#RUN echo "extension=memcache.so" >> /usr/local/etc/php/conf.d/memcache.ini
-
 
 WORKDIR /app
 RUN echo 'alias sc="php /app/bin/console"' >> ~/.bashrc
