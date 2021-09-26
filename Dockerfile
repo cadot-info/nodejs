@@ -101,4 +101,16 @@ RUN echo 'alias ls="ls --color"'>>/etc/bash.bashrc
 WORKDIR /app
 RUN echo 'alias sc="php /app/bin/console"' >> ~/.bashrc
 
+RUN sed -i.bak "s/opcache.validate_timestamps=0/opcache.validate_timestamps=1/g" /usr/local/etc/php/conf.d/symfony.ini \
+ && sed -i.bak "s/display_errors = 0/display_errors = 1/g" /usr/local/etc/php/conf.d/general.ini \
+ && sed -i.bak "s/display_startup_errors = 0/display_startup_errors = 1/g" /usr/local/etc/php/conf.d/general.ini \
+ || true
+
+RUN pecl install apcu \
+    && pecl clear-cache \
+    && echo "extension=apcu.so" > /usr/local/etc/php/conf.d/apcu.ini
+
+ENV TZ=Europe/Paris
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 CMD ["apache2-foreground"]
