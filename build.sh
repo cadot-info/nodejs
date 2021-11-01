@@ -1,1 +1,1 @@
-docker build -t cadotinfo/symfony5 .
+docker build -t cadotinfo/nodejs .

@@ -87,7 +87,7 @@ RUN cat /php.ini>>${PHP_INI_DIR}/php.ini
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-RUN curl -fsSL https://deb.nodesource.com/setup_15.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
 RUN apt-get install -y nodejs nano
 RUN npm install -g yarn
 
@@ -104,22 +104,8 @@ RUN set -ex \
     && docker-php-ext-install $MEMCACHED \
     && rm -rf $MEMCACHED
 
-ENV SYMFONY_DEPRECATIONS_HELPER=weak 
-
-# RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo    
-# Chromium and ChromeDriver
-ENV PANTHER_NO_SANDBOX 1
-# Not mandatory, but recommended
-ENV PANTHER_CHROME_ARGUMENTS='--disable-dev-shm-usage'
-
 RUN LC_ALL=fr_FR.UTF-8
 
-RUN wget https://phar.phpunit.de/phpunit.phar
-RUN chmod +x phpunit.phar
-RUN mv phpunit.phar /usr/local/bin/phpunit
-RUN command -v phpunit
-
 WORKDIR /app
-RUN echo 'alias sc="php /app/bin/console"' >> ~/.bashrc
 
 CMD ["apache2-foreground"]
