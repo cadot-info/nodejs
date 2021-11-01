@@ -1,14 +1,14 @@
-# symfony5
-Docker for symfony 5 with composer, yarn, nodejs and npm
+# nodejs
+Docker for nodejs,npm and php   with composer, yarn, nodejs and npm
 ## execution in your symfony directory
 `
-docker run -d -p 80:80  --name symfony5 -v .:/app cadotinfo/symfony5
+docker run -d -p 80:80  --name nodejs -v .:/app cadotinfo/nodejs
 `
 ## or by docker-compose with traefik
 `
 ...
-image: cadotinfo/symfony5 
-    container_name: symfony5
+image: cadotinfo/nodejs 
+    container_name: nodejs
     volumes:
       - /home/ubuntu/my_symfony:/app
     networks:
@@ -16,6 +16,7 @@ image: cadotinfo/symfony5
     restart: always
     labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.symfony5.rule=Host(`symfony5.website.com`)"
+        - "traefik.http.routers.nodejs.rule=Host(`nodejs.website.com`)"
 ...
 `
+# nodejs
